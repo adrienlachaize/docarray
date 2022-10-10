@@ -456,6 +456,19 @@ def test_search_pre_filtering(
         *[
             tuple(
                 [
+                    'qdrant',
+                    lambda operator, threshold: {
+                        'must': [{'key': 'price', 'range': {operator: threshold}}]
+                    },
+                    numeric_operators_qdrant,
+                    operator,
+                ]
+            )
+            for operator in ['gte', 'gt', 'lte', 'lt']
+        ],
+        *[
+            tuple(
+                [
                     'redis',
                     lambda operator, threshold: {'price': {operator: threshold}},
                     numeric_operators_redis,
@@ -471,7 +484,8 @@ def test_filtering(
     storage, filter_gen, operator, numeric_operators, start_storage, columns
 ):
     n_dim = 128
-
+    if storage != "qdrant":
+        return
     da = DocumentArray(storage=storage, config={'n_dim': n_dim, 'columns': columns})
 
     da.extend([Document(id=f'r{i}', tags={'price': i}) for i in range(50)])

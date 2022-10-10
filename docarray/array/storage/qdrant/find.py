@@ -4,10 +4,11 @@ from typing import (
     TypeVar,
     Sequence,
     List,
-    Dict,
+    Union,
     Optional,
+    Dict,
 )
-
+from qdrant_client.models import Filter
 from qdrant_client.http.models.models import Distance
 
 from docarray import Document, DocumentArray
@@ -103,3 +104,18 @@ class FindMixin:
                 da = self._find_similar_vectors(q, limit=limit, filter=filter)
                 closest_docs.append(da)
             return closest_docs
+
+    def _find_with_filter(self, query: Dict, limit: Optional[Union[int, float]] = 20):
+        print("hello world")
+        _, _offset = self.client.scroll(
+            collection_name=self.collection_name,
+            scroll_filter=Filter(),
+            with_payload=True,
+            limit=limit,
+        )
+
+    def _filter(
+        self, query: Dict, limit: Optional[Union[int, float]] = 20
+    ) -> 'DocumentArray':
+
+        return self._find_with_filter(query, limit=limit)
