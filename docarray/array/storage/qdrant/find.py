@@ -8,7 +8,6 @@ from typing import (
     Optional,
     Dict,
 )
-from qdrant_client.models import Filter
 from qdrant_client.http.models.models import Distance
 
 from docarray import Document, DocumentArray
@@ -105,17 +104,26 @@ class FindMixin:
                 closest_docs.append(da)
             return closest_docs
 
-    def _find_with_filter(self, query: Dict, limit: Optional[Union[int, float]] = 20):
-        print("hello world")
-        _, _offset = self.client.scroll(
+    def _find_with_filter(
+        self, filter: Optional[Dict], limit: Optional[Union[int, float]] = 20
+    ):
+        list_of_points, _offset = self.client.scroll(
             collection_name=self.collection_name,
-            scroll_filter=Filter(),
+            scroll_filter=filter,
             with_payload=True,
             limit=limit,
         )
+        da = DocumentArray()
+        for result in list_of_points[:limit]:
+            '''
+            doc = Document.from_base64(result['_source']['blob'])
+            doc.scores['score'] = NamedScore(value=result['_score'])
+            da.append(doc)
+            '''
+        return da
 
     def _filter(
-        self, query: Dict, limit: Optional[Union[int, float]] = 20
+        self, filter: Optional[Dict], limit: Optional[Union[int, float]] = 20
     ) -> 'DocumentArray':
 
-        return self._find_with_filter(query, limit=limit)
+        return self._find_with_filter(filter, limit=limit)

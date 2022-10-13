@@ -404,60 +404,6 @@ def test_search_pre_filtering(
         *[
             tuple(
                 [
-                    'weaviate',
-                    lambda operator, threshold: {
-                        'path': ['price'],
-                        'operator': operator,
-                        'valueNumber': threshold,
-                    },
-                    numeric_operators_weaviate,
-                    operator,
-                ]
-            )
-            for operator in numeric_operators_weaviate.keys()
-        ],
-        *[
-            tuple(
-                [
-                    'elasticsearch',
-                    lambda operator, threshold: {'match': {'price': threshold}},
-                    numeric_operators_elasticsearch,
-                    operator,
-                ]
-            )
-            for operator in ['eq']
-        ],
-        *[
-            tuple(
-                [
-                    'elasticsearch',
-                    lambda operator, threshold: {
-                        'range': {
-                            'price': {
-                                operator: threshold,
-                            }
-                        }
-                    },
-                    numeric_operators_elasticsearch,
-                    operator,
-                ]
-            )
-            for operator in ['gt', 'gte', 'lt', 'lte']
-        ],
-        *[
-            tuple(
-                [
-                    'annlite',
-                    lambda operator, threshold: {'price': {operator: threshold}},
-                    numeric_operators_annlite,
-                    operator,
-                ]
-            )
-            for operator in numeric_operators_annlite.keys()
-        ],
-        *[
-            tuple(
-                [
                     'qdrant',
                     lambda operator, threshold: {
                         'must': [{'key': 'price', 'range': {operator: threshold}}]
@@ -466,18 +412,7 @@ def test_search_pre_filtering(
                     operator,
                 ]
             )
-            for operator in numeric_operators_qdrant.keys()
-        ],
-        *[
-            tuple(
-                [
-                    'redis',
-                    lambda operator, threshold: {'price': {operator: threshold}},
-                    numeric_operators_redis,
-                    operator,
-                ]
-            )
-            for operator in numeric_operators_redis.keys()
+            for operator in ['gte']
         ],
     ],
 )
@@ -486,8 +421,7 @@ def test_filtering(
     storage, filter_gen, operator, numeric_operators, start_storage, columns
 ):
     n_dim = 128
-    print(columns)
-    print(n_dim)
+
     da = DocumentArray(storage=storage, config={'n_dim': n_dim, 'columns': columns})
 
     da.extend([Document(id=f'r{i}', tags={'price': i}) for i in range(50)])
