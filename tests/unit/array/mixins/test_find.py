@@ -372,7 +372,9 @@ def test_search_pre_filtering(
 ):
     np.random.seed(0)
     n_dim = 128
-
+    print(storage)
+    print(n_dim)
+    print(columns)
     da = DocumentArray(storage=storage, config={'n_dim': n_dim, 'columns': columns})
 
     da.extend(
@@ -464,7 +466,7 @@ def test_search_pre_filtering(
                     operator,
                 ]
             )
-            for operator in ['gte', 'gt', 'lte', 'lt']
+            for operator in numeric_operators_qdrant.keys()
         ],
         *[
             tuple(
@@ -484,8 +486,8 @@ def test_filtering(
     storage, filter_gen, operator, numeric_operators, start_storage, columns
 ):
     n_dim = 128
-    if storage != "qdrant":
-        return
+    print(columns)
+    print(n_dim)
     da = DocumentArray(storage=storage, config={'n_dim': n_dim, 'columns': columns})
 
     da.extend([Document(id=f'r{i}', tags={'price': i}) for i in range(50)])
