@@ -372,9 +372,7 @@ def test_search_pre_filtering(
 ):
     np.random.seed(0)
     n_dim = 128
-    print(storage)
-    print(n_dim)
-    print(columns)
+
     da = DocumentArray(storage=storage, config={'n_dim': n_dim, 'columns': columns})
 
     da.extend(
@@ -404,15 +402,67 @@ def test_search_pre_filtering(
         *[
             tuple(
                 [
-                    'qdrant',
+                    'weaviate',
                     lambda operator, threshold: {
-                        'must': [{'key': 'price', 'range': {operator: threshold}}]
+                        'path': ['price'],
+                        'operator': operator,
+                        'valueNumber': threshold,
                     },
-                    numeric_operators_qdrant,
+                    numeric_operators_weaviate,
                     operator,
                 ]
             )
-            for operator in ['gte']
+            for operator in numeric_operators_weaviate.keys()
+        ],
+        *[
+            tuple(
+                [
+                    'elasticsearch',
+                    lambda operator, threshold: {'match': {'price': threshold}},
+                    numeric_operators_elasticsearch,
+                    operator,
+                ]
+            )
+            for operator in ['eq']
+        ],
+        *[
+            tuple(
+                [
+                    'elasticsearch',
+                    lambda operator, threshold: {
+                        'range': {
+                            'price': {
+                                operator: threshold,
+                            }
+                        }
+                    },
+                    numeric_operators_elasticsearch,
+                    operator,
+                ]
+            )
+            for operator in ['gt', 'gte', 'lt', 'lte']
+        ],
+        *[
+            tuple(
+                [
+                    'annlite',
+                    lambda operator, threshold: {'price': {operator: threshold}},
+                    numeric_operators_annlite,
+                    operator,
+                ]
+            )
+            for operator in numeric_operators_annlite.keys()
+        ],
+        *[
+            tuple(
+                [
+                    'redis',
+                    lambda operator, threshold: {'price': {operator: threshold}},
+                    numeric_operators_redis,
+                    operator,
+                ]
+            )
+            for operator in numeric_operators_redis.keys()
         ],
     ],
 )
@@ -437,6 +487,13 @@ def test_filtering(
         assert all(
             [numeric_operators[operator](r.tags['price'], threshold) for r in results]
         )
+
+
+@pytest.mark.parametrize('columns', [[('price', 'int')], {'price': 'int'}])
+def test_qdrant_filter_function(start_storage, columns):
+    n_dim = 128
+    # da = DocumentArray(storage='qdrant', config={'n_dim': n_dim, 'columns': columns})
+    assert n_dim > 0
 
 
 @pytest.mark.parametrize('columns', [[('price', 'int')], {'price': 'int'}])

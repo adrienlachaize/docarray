@@ -105,7 +105,7 @@ class FindMixin:
             return closest_docs
 
     def _find_with_filter(
-        self, filter: Optional[Dict], limit: Optional[Union[int, float]] = 20
+        self, filter: Optional[Dict], limit: Optional[Union[int, float]] = 10
     ):
         list_of_points, _offset = self.client.scroll(
             collection_name=self.collection_name,
@@ -115,15 +115,14 @@ class FindMixin:
         )
         da = DocumentArray()
         for result in list_of_points[:limit]:
-            '''
-            doc = Document.from_base64(result['_source']['blob'])
-            doc.scores['score'] = NamedScore(value=result['_score'])
+            doc = Document.from_base64(
+                result.payload['_serialized'], **self.serialize_config
+            )
             da.append(doc)
-            '''
         return da
 
     def _filter(
-        self, filter: Optional[Dict], limit: Optional[Union[int, float]] = 20
+        self, filter: Optional[Dict], limit: Optional[Union[int, float]] = 10
     ) -> 'DocumentArray':
 
         return self._find_with_filter(filter, limit=limit)
