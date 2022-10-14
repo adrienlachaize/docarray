@@ -146,7 +146,7 @@ in [Qdrant's Documentation](https://qdrant.tech/documentation/filtering/)
 Consider Documents with embeddings `[0,0,0]` up to ` [9,9,9]` where the document with embedding `[i,i,i]`
 has as tag `price` with value `i`. We can create such example with the following code:
 
-```python
+```pyt
 from docarray import Document, DocumentArray
 import numpy as np
 
@@ -206,3 +206,5 @@ Embeddings Nearest Neighbours with "price" at most 7:
 	embedding=[5. 5. 5.],	 price=5
 	embedding=[4. 4. 4.],	 price=4
 ```
+### Example of `.filter` with a filter
+
