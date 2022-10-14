@@ -124,5 +124,11 @@ class FindMixin:
     def _filter(
         self, filter: Optional[Dict], limit: Optional[Union[int, float]] = 10
     ) -> 'DocumentArray':
+        """Returns a subset of documents by filtering by the given filter (`Qdrant` filter)..
+        :param limit: number of retrieved items
+        :param filter: filter query used for pre-filtering
+
+        :return: a `DocumentArray` containing the `Document` objects that verify the filter.
+        """
 
         return self._find_with_filter(filter, limit=limit)

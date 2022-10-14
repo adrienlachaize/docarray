@@ -492,7 +492,7 @@ def test_filtering(
 @pytest.mark.parametrize('columns', [[('price', 'int')], {'price': 'int'}])
 def test_qdrant_filter_function(start_storage, columns):
     n_dim = 128
-    # da = DocumentArray(storage='qdrant', config={'n_dim': n_dim, 'columns': columns})
+    da = DocumentArray(storage='qdrant', config={'n_dim': n_dim, 'columns': columns})
     assert n_dim > 0
 
 
